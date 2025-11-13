@@ -1,0 +1,45 @@
+name: Ruby Lint (RuboCop)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  rubocop:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.0'
+        bundler-cache: false
+        
+    - name: Install RuboCop
+      run: |
+        gem install rubocop
+        gem install rubocop-performance
+        
+    - name: Run RuboCop
+      run: rubocop --format progress --format json --out rubocop-results.json || true
+      
+    - name: Upload RuboCop results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: rubocop-results
+        path: rubocop-results.json
+        
+    - name: Annotate code with RuboCop results
+      uses: reviewdog/action-rubocop@v2
+      if: github.event_name == 'pull_request'
+      with:
+        rubocop_version: latest
+        reporter: github-pr-review
+        fail_on_error: false

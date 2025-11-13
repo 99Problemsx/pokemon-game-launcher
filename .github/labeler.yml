@@ -1,0 +1,65 @@
+ruby:
+  - changed-files:
+      - any-glob-to-any-file: '**/*.rb'
+  - changed-files:
+      - any-glob-to-any-file: 'Plugins/**'
+  
+javascript:
+  - changed-files:
+      - any-glob-to-any-file: '**/*.js'
+  
+documentation:
+  - changed-files:
+      - any-glob-to-any-file: '**/*.md'
+  - changed-files:
+      - any-glob-to-any-file: '**/*.txt'
+  - changed-files:
+      - any-glob-to-any-file: 'POKEDEX-README.md'
+  
+data:
+  - changed-files:
+      - any-glob-to-any-file: 'PBS/**'
+  - changed-files:
+      - any-glob-to-any-file: 'Data/**'
+  - changed-files:
+      - any-glob-to-any-file: 'pokemon-data.js'
+  
+graphics:
+  - changed-files:
+      - any-glob-to-any-file: 'Graphics/**'
+  - changed-files:
+      - any-glob-to-any-file: 'Animations/**'
+  - changed-files:
+      - any-glob-to-any-file: '**/*.png'
+  - changed-files:
+      - any-glob-to-any-file: '**/*.jpg'
+  - changed-files:
+      - any-glob-to-any-file: '**/*.gif'
+  
+audio:
+  - changed-files:
+      - any-glob-to-any-file: 'Audio/**'
+  - changed-files:
+      - any-glob-to-any-file: '**/*.ogg'
+  - changed-files:
+      - any-glob-to-any-file: '**/*.mp3'
+  - changed-files:
+      - any-glob-to-any-file: '**/*.wav'
+  
+web:
+  - changed-files:
+      - any-glob-to-any-file: '**/*.html'
+  - changed-files:
+      - any-glob-to-any-file: '**/*.css'
+  - changed-files:
+      - any-glob-to-any-file: 'index.html'
+  - changed-files:
+      - any-glob-to-any-file: 'style.css'
+  
+translation:
+  - changed-files:
+      - any-glob-to-any-file: 'Text_deutsch_core/**'
+  - changed-files:
+      - any-glob-to-any-file: 'Text_deutsch_game/**'
+  - changed-files:
+      - any-glob-to-any-file: 'Text_english_core/**'

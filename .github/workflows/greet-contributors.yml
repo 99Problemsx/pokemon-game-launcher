@@ -1,0 +1,28 @@
+name: Greet Contributors
+
+on:
+  issues:
+    types: [opened]
+  pull_request_target:
+    types: [opened]
+
+jobs:
+  greet:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      
+    steps:
+    - name: Greet new contributors
+      uses: actions/first-interaction@v3
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        issue_message: |
+          👋 Willkommen! Vielen Dank für dein erstes Issue im Illusion Projekt!
+          
+          Bitte stelle sicher, dass du alle relevanten Informationen bereitgestellt hast.
+        pr_message: |
+          🎉 Vielen Dank für deinen ersten Pull Request!
+          
+          Ein Maintainer wird sich deinen PR bald ansehen!

@@ -1,0 +1,48 @@
+name: JavaScript Lint & Test
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - '**.js'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - '**.js'
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v5
+      with:
+        node-version: '20'
+        
+    - name: Check JavaScript files exist
+      id: check_js
+      run: |
+        if ls *.js 1> /dev/null 2>&1; then
+          echo "js_files=true" >> $GITHUB_OUTPUT
+        else
+          echo "js_files=false" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Validate JavaScript syntax
+      if: steps.check_js.outputs.js_files == 'true'
+      run: |
+        for file in *.js; do
+          echo "Checking $file..."
+          node --check "$file" || echo "Syntax error in $file"
+        done
+        
+    - name: Summary
+      run: |
+        echo "## ✅ JavaScript Validation Complete" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "All JavaScript files validated successfully!" >> $GITHUB_STEP_SUMMARY

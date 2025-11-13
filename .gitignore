@@ -1,0 +1,111 @@
+# Build artifacts
+build/
+dist/
+*.log
+*.tmp
+
+# Game Files (stored in 'game' branch)
+# Main branch = Website/Docs only
+# Game branch = Complete game
+/PBS/
+/Plugins/
+/Graphics/
+/Audio/
+/Data/
+/Animations/
+/Fonts/
+/Text_deutsch_core/
+/Text_deutsch_game/
+/Text_english_core/
+/OPTIONAL/
+/EventExporter/
+
+# Game executables & data
+*.exe
+*.dll
+*.so
+*.dylib
+Game.ini
+Game.rxproj
+mkxp.json
+soundfont.sf2
+*.rxdata
+*.rvdata
+*.rvdata2
+*.anm
+*.xcf
+*.bmp
+*.rar
+
+# Game scripts and tools
+scripts_extract.rb
+scripts_combine.rb
+rebuild-species-names.js
+test-*.js
+animmaker.txt
+extendtext.txt
+reborn.anm
+knownpoint.bmp
+selpoint.bmp
+townmapgen*.html
+
+# Test files
+Test*.txt
+Whats*.txt
+
+# Node modules
+node_modules/
+
+# Rust/Cargo build artifacts
+target/
+Cargo.lock
+
+# Tauri launcher (not used - deleted)
+launcher-tauri/
+
+# Electron build artifacts
+launcher-electron/dist/
+launcher-electron/out/
+
+# Environment variables (NEVER commit!)
+.env
+.env.local
+.env.production
+.env.development
+*.env
+
+# Game-specific configuration (NEVER commit for Open Source!)
+launcher-electron/games.config.json
+launcher-electron/mystery-gifts.config.json
+
+# Development
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Release artifacts (never commit these!)
+*.zip
+*.7z
+*.rar
+*.tar.gz
+Pokemon-Illusion-*.zip
+
+# Backups
+*.backup
+*.bak
+*-backup-*
+
+# Temporary
+temp/
+tmp/
+
+# Note: Website files (HTML, CSS, JS) ARE included
+# pokemon/ folder IS included for GitHub Pages
+

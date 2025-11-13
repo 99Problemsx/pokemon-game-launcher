@@ -1,0 +1,137 @@
+name: Build and Release Game
+
+on:
+  release:
+    types: [created, published]
+  workflow_dispatch:  # Allows manual trigger
+    inputs:
+      version:
+        description: 'Version tag (e.g., 0.1)'
+        required: true
+        default: '0.1'
+
+jobs:
+  build-and-upload:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true  # Pull LFS files if you use Git LFS for large assets
+      
+      - name: Get Release Info
+        id: release
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "tag=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+            echo "is_manual=true" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+            echo "upload_url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
+            echo "is_manual=false" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+      
+      - name: Prepare Game Files
+        shell: pwsh
+        run: |
+          Write-Host "📦 Preparing Pokémon Illusion for release..."
+          
+          # Create release directory
+          $releaseDir = "Pokemon-Illusion-${{ steps.release.outputs.tag }}"
+          New-Item -ItemType Directory -Force -Path $releaseDir
+          
+          # Copy essential game files
+          $filesToCopy = @(
+            "Game.exe",
+            "Game.ini",
+            "Audio",
+            "Data",
+            "Graphics",
+            "Fonts",
+            "PBS",
+            "Plugins"
+          )
+          
+          foreach ($item in $filesToCopy) {
+            if (Test-Path $item) {
+              Write-Host "✓ Copying $item..."
+              if (Test-Path $item -PathType Container) {
+                Copy-Item -Path $item -Destination "$releaseDir\$item" -Recurse -Force
+              } else {
+                Copy-Item -Path $item -Destination "$releaseDir\$item" -Force
+              }
+            } else {
+              Write-Host "⚠ Warning: $item not found, skipping..."
+            }
+          }
+          
+          # Create README for the release
+          @"
+          # Pokémon Illusion - Version ${{ steps.release.outputs.tag }}
+          
+          ## Installation
+          1. Extract this ZIP file to a folder of your choice
+          2. Run Game.exe to start playing
+          
+          ## System Requirements
+          - Windows 7 or later
+          - DirectX 9.0c or later
+          - 2GB RAM minimum
+          
+          ## Support
+          - GitHub: https://github.com/99Problemsx/Illusion
+          - Issues: https://github.com/99Problemsx/Illusion/issues
+          
+          Enjoy your adventure! 🎮✨
+          "@ | Out-File -FilePath "$releaseDir\README.txt" -Encoding UTF8
+          
+          Write-Host "📦 Game files prepared successfully!"
+      
+      - name: Create ZIP Archive
+        shell: pwsh
+        run: |
+          Write-Host "🗜️ Creating ZIP archive..."
+          $releaseDir = "Pokemon-Illusion-${{ steps.release.outputs.tag }}"
+          $zipFile = "Pokemon-Illusion-${{ steps.release.outputs.tag }}-Windows.zip"
+          
+          # Use .NET Compression (built into PowerShell)
+          Add-Type -Assembly System.IO.Compression.FileSystem
+          [System.IO.Compression.ZipFile]::CreateFromDirectory($releaseDir, $zipFile, [System.IO.Compression.CompressionLevel]::Optimal, $false)
+          
+          # Get file size
+          $size = [math]::Round((Get-Item $zipFile).Length / 1MB, 2)
+          Write-Host "✓ Created $zipFile ($size MB)"
+          
+          # Save filename for next step
+          echo "ZIP_FILE=$zipFile" >> $env:GITHUB_ENV
+      
+      - name: Upload Release Asset (if release event)
+        if: steps.release.outputs.is_manual == 'false'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ env.ZIP_FILE }}
+          asset_name: ${{ env.ZIP_FILE }}
+          asset_content_type: application/zip
+      
+      - name: Upload Artifact (if manual run)
+        if: steps.release.outputs.is_manual == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pokemon-illusion-${{ steps.release.outputs.tag }}
+          path: ${{ env.ZIP_FILE }}
+          retention-days: 90
+      
+      - name: Release Complete
+        shell: pwsh
+        run: |
+          Write-Host "✅ Release build complete!"
+          if ("${{ steps.release.outputs.is_manual }}" -eq "true") {
+            Write-Host "📥 Download available in Actions artifacts tab"
+          } else {
+            Write-Host "📥 Download available at: https://github.com/99Problemsx/Illusion/releases/tag/${{ steps.release.outputs.tag }}"
+          }

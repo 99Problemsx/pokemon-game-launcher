@@ -1,0 +1,43 @@
+name: Validate PBS Files
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'PBS/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'PBS/**'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check PBS files exist
+      run: |
+        if [ -d "PBS" ]; then
+          echo "PBS directory found"
+          find PBS -type f -name "*.txt" | head -20
+        else
+          echo "Warning: PBS directory not found"
+          exit 1
+        fi
+        
+    - name: Validate PBS file encoding
+      run: |
+        echo "Checking PBS files for UTF-8 encoding..."
+        find PBS -type f -name "*.txt" -exec file {} \; | grep -v "UTF-8\|ASCII" || echo "All files are properly encoded"
+        
+    - name: Check for common PBS issues
+      run: |
+        echo "Checking for trailing whitespace..."
+        find PBS -type f -name "*.txt" -exec grep -l " $" {} \; || echo "No trailing whitespace found"
+        
+        echo "Checking for tabs..."
+        find PBS -type f -name "*.txt" -exec grep -l $'\t' {} \; || echo "No tabs found"

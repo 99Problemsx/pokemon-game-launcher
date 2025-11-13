@@ -1,0 +1,142 @@
+{
+  "app": {
+    "name": "Mirrorbytes Studio",
+    "welcome": "Welcome to Mirrorbytes Studio!"
+  },
+  "nav": {
+    "home": "Home",
+    "library": "Library",
+    "updates": "News & Updates",
+    "dailylogin": "Daily Rewards",
+    "achievements": "Achievements",
+    "backup": "Backups",
+    "statistics": "Statistics",
+    "discord": "Discord",
+    "themes": "Themes",
+    "launchoptions": "Launch Options",
+    "settings": "Settings"
+  },
+  "game": {
+    "play": "Play",
+    "install": "Install",
+    "update": "Update Available",
+    "updating": "Updating...",
+    "downloading": "Downloading...",
+    "launching": "Launching...",
+    "installed": "Installed",
+    "notInstalled": "Not Installed",
+    "version": "Version",
+    "playtime": "Playtime",
+    "openFolder": "Open Folder",
+    "uninstall": "Uninstall",
+    "checkUpdates": "Check for Updates"
+  },
+  "home": {
+    "title": "Your Games",
+    "readyToPlay": "Ready to Play"
+  },
+  "library": {
+    "title": "Library"
+  },
+  "achievements": {
+    "title": "Achievements & Rewards",
+    "progress": "Progress",
+    "unlocked": "Unlocked",
+    "locked": "Locked",
+    "points": "Points",
+    "mysteryGift": "Mystery Gift",
+    "enterCode": "Enter Code",
+    "redeem": "Redeem",
+    "redeemed": "Already Redeemed",
+    "invalidCode": "Invalid Code",
+    "success": "Successfully Redeemed!"
+  },
+  "discord": {
+    "title": "Discord Integration",
+    "description": "Show your activity on Discord",
+    "status": "Status",
+    "connected": "Connected to Discord",
+    "notConnected": "Not Connected",
+    "richPresence": "Rich Presence",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "showDetails": "Show Details",
+    "showDetailsDesc": "Display game information (location, time, etc.)",
+    "preview": "Preview",
+    "testActivities": "Test Activities",
+    "launcher": "Launcher",
+    "battle": "Battle",
+    "training": "Training",
+    "trading": "Trading",
+    "exploring": "Exploring",
+    "menu": "Menu",
+    "gym": "Gym",
+    "catching": "Catching",
+    "inGame": "In Game (with Map)",
+    "note": "Note",
+    "noteText": "Discord must be running for Rich Presence to work. Activity updates automatically while you play.",
+    "mapTip": "The map is automatically detected and displayed when you're in game!"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "gameInstallPath": "Game Installation Path",
+    "autoUpdate": "Automatic Updates",
+    "autoUpdateDesc": "Download updates automatically",
+    "notifications": "Notifications",
+    "notificationsDesc": "Show desktop notifications",
+    "theme": "Theme",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "backup": {
+    "title": "Save File Backups",
+    "description": "Backup and restore your save files",
+    "createBackup": "Create Backup",
+    "restoreBackup": "Restore Backup",
+    "deleteBackup": "Delete Backup",
+    "noBackups": "No Backups Available",
+    "backupCreated": "Backup Created Successfully",
+    "backupRestored": "Backup Restored Successfully",
+    "backupDeleted": "Backup Deleted"
+  },
+  "updates": {
+    "title": "Updates & News",
+    "checkingUpdates": "Checking for Updates...",
+    "noUpdates": "You're up to date!",
+    "updateAvailable": "Update Available!",
+    "currentVersion": "Current Version",
+    "latestVersion": "Latest Version",
+    "downloadUpdate": "Download Update",
+    "releaseNotes": "Release Notes"
+  },
+  "notifications": {
+    "downloadStarted": "Download Started",
+    "downloadComplete": "Download Complete",
+    "installationComplete": "Installation Complete",
+    "updateInstalled": "Update Installed",
+    "error": "Error",
+    "success": "Success",
+    "gameLaunched": "Game Launched",
+    "folderOpened": "Folder Opened"
+  },
+  "errors": {
+    "gameNotInstalled": "Game is not installed",
+    "downloadFailed": "Download Failed",
+    "installationFailed": "Installation Failed",
+    "launchFailed": "Could not launch game",
+    "updateCheckFailed": "Update Check Failed",
+    "pathNotAvailable": "Path not available",
+    "backupFailed": "Backup Failed",
+    "restoreFailed": "Restore Failed"
+  },
+  "dialogs": {
+    "confirm": "Confirm",
+    "confirmUninstall": "Do you really want to uninstall this game?",
+    "confirmDelete": "Do you really want to delete this backup?",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "cancel": "Cancel"
+  }
+}

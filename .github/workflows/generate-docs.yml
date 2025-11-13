@@ -1,0 +1,52 @@
+name: Generate Documentation
+
+on:
+  push:
+    branches: [ github ]
+    paths:
+      - 'Plugins/**/*.rb'
+      - 'PBS/**/*.txt'
+  workflow_dispatch:
+
+jobs:
+  generate-docs:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.0'
+        
+    - name: Generate Plugin Documentation
+      run: |
+        mkdir -p docs
+        echo "# Illusion - Plugin Documentation" > docs/plugins.md
+        echo "" >> docs/plugins.md
+        echo "Generated on: $(date)" >> docs/plugins.md
+        echo "" >> docs/plugins.md
+        
+        find Plugins -name "*.rb" | while read file; do
+          echo "## $(basename $file)" >> docs/plugins.md
+          echo "\`\`\`ruby" >> docs/plugins.md
+          head -20 "$file" >> docs/plugins.md
+          echo "\`\`\`" >> docs/plugins.md
+          echo "" >> docs/plugins.md
+        done
+        
+    - name: Generate PBS Documentation
+      run: |
+        echo "# PBS Files Overview" > docs/pbs-files.md
+        echo "" >> docs/pbs-files.md
+        find PBS -name "*.txt" -type f | sort | while read file; do
+          echo "- $(basename $file)" >> docs/pbs-files.md
+        done
+        
+    - name: Upload Documentation
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation
+        path: docs/

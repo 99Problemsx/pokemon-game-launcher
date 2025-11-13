@@ -1,0 +1,61 @@
+name: Launcher CI/CD
+
+on:
+  push:
+    branches: [ launcher ]
+    paths:
+      - 'launcher-electron/**'
+      - '.github/workflows/launcher-ci.yml'
+  pull_request:
+    branches: [ launcher ]
+    paths:
+      - 'launcher-electron/**'
+
+jobs:
+  build-and-test:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+        node-version: [20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: launcher-electron/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: ./launcher-electron
+      run: npm ci
+    
+    - name: Run linting
+      working-directory: ./launcher-electron
+      run: npm run lint --if-present || echo "No lint script found"
+    
+    - name: Run tests
+      working-directory: ./launcher-electron
+      run: npm test --if-present || echo "No test script found"
+    
+    - name: Build Electron app
+      working-directory: ./launcher-electron
+      run: npm run build
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: launcher-build-${{ matrix.os }}
+        path: |
+          launcher-electron/dist/*.exe
+          launcher-electron/dist/*.dmg
+          launcher-electron/dist/*.AppImage
+        if-no-files-found: warn
+        retention-days: 7

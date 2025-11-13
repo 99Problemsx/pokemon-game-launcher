@@ -1,0 +1,25 @@
+name: Mark Stale Issues
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      
+    steps:
+    - name: Mark stale issues and PRs
+      uses: actions/stale@v9
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        stale-issue-message: 'Dieses Issue wurde seit 60 Tagen nicht aktualisiert.'
+        stale-pr-message: 'Dieser Pull Request wurde seit 30 Tagen nicht aktualisiert.'
+        days-before-issue-stale: 60
+        days-before-pr-stale: 30
+        days-before-issue-close: 90
+        days-before-pr-close: 60

@@ -1,0 +1,121 @@
+name: 🚀 Build Launcher
+
+on:
+  push:
+    branches: [launcher]
+    paths:
+      - 'launcher-electron/**'
+  pull_request:
+    branches: [launcher]
+    paths:
+      - 'launcher-electron/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: launcher-electron/package-lock.json
+      
+      - name: 📚 Install Dependencies
+        working-directory: launcher-electron
+        run: npm ci
+      
+      - name: 🔍 Lint Code
+        working-directory: launcher-electron
+        run: npm run lint --if-present
+      
+      - name: 🏗️ Build Launcher (Windows)
+        if: matrix.os == 'windows-latest'
+        working-directory: launcher-electron
+        run: npm run build:win
+      
+      - name: 🏗️ Build Launcher (macOS)
+        if: matrix.os == 'macos-latest'
+        working-directory: launcher-electron
+        run: npm run build:mac
+      
+      - name: 🏗️ Build Launcher (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        working-directory: launcher-electron
+        run: npm run build:linux
+      
+      - name: 📤 Upload Artifacts (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Illusion-Launcher-Windows
+          path: launcher-electron/dist/*.exe
+          retention-days: 30
+      
+      - name: 📤 Upload Artifacts (macOS)
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Illusion-Launcher-macOS
+          path: launcher-electron/dist/*.dmg
+          retention-days: 30
+      
+      - name: 📤 Upload Artifacts (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Illusion-Launcher-Linux
+          path: launcher-electron/dist/*.AppImage
+          retention-days: 30
+
+  release:
+    name: 🎉 Create Release
+    needs: build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/launcher-v')
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+    
+    steps:
+      - name: 📥 Download All Artifacts
+        uses: actions/download-artifact@v4
+      
+      - name: 🎁 Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            Illusion-Launcher-Windows/*.exe
+            Illusion-Launcher-macOS/*.dmg
+            Illusion-Launcher-Linux/*.AppImage
+          body: |
+            ## 🎮 Illusion Launcher ${{ github.ref_name }}
+            
+            ### 📥 Downloads
+            - **Windows**: `.exe` Installer
+            - **macOS**: `.dmg` Installer
+            - **Linux**: `.AppImage` Portable
+            
+            ### ✨ Features
+            - Modern Glassmorphism UI
+            - Auto-Update Support
+            - Multi-Game Management
+            
+            ### 📝 Installation
+            1. Download the installer for your OS
+            2. Run the installer
+            3. Launch Illusion!
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

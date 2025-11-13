@@ -1,0 +1,66 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 1'  # Montags
+  workflow_dispatch:
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run Trivy security scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'table'
+        exit-code: '0'
+        
+    - name: Check for sensitive files
+      run: |
+        echo "## 🔒 Security Scan Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        echo "� Checking for sensitive files..."
+        
+        SENSITIVE_PATTERNS=(
+          "*.key"
+          "*.pem"
+          "*.p12"
+          "*.pfx"
+          "*password*"
+          "*secret*"
+          "*.env"
+        )
+        
+        FOUND=0
+        for pattern in "${SENSITIVE_PATTERNS[@]}"; do
+          FILES=$(find . -name "$pattern" -not -path "*/\.git/*" -not -path "*/node_modules/*" 2>/dev/null || true)
+          if [ -n "$FILES" ]; then
+            echo "⚠️ Found potentially sensitive files matching $pattern:"
+            echo "$FILES"
+            echo "### ⚠️ Warning: $pattern" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "$FILES" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            FOUND=1
+          fi
+        done
+        
+        if [ $FOUND -eq 0 ]; then
+          echo "✅ No sensitive files found!" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Security scan complete"

@@ -1,0 +1,59 @@
+name: 💬 Discussion Notifications
+on:
+  discussion:
+    types: [created, answered, category_changed]
+  discussion_comment:
+    types: [created]
+
+permissions:
+  discussions: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📣 Send Discord Notification
+        if: github.event_name == 'discussion' && github.event.action == 'created'
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          title: "💬 New Discussion"
+          description: |
+            **${{ github.event.discussion.title }}**
+            
+            Category: ${{ github.event.discussion.category.name }}
+            Author: @${{ github.event.discussion.user.login }}
+          url: ${{ github.event.discussion.html_url }}
+          color: 0x5814F7
+          username: "Illusion Bot"
+          avatar_url: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+
+      - name: 💬 Comment Notification
+        if: github.event_name == 'discussion_comment'
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          title: "💬 New Comment on Discussion"
+          description: |
+            **${{ github.event.discussion.title }}**
+            
+            Comment by: @${{ github.event.comment.user.login }}
+          url: ${{ github.event.comment.html_url }}
+          color: 0x3B82F6
+          username: "Illusion Bot"
+          avatar_url: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+
+      - name: ✅ Discussion Answered
+        if: github.event_name == 'discussion' && github.event.action == 'answered'
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          title: "✅ Discussion Answered"
+          description: |
+            **${{ github.event.discussion.title }}**
+            
+            Question was answered!
+          url: ${{ github.event.discussion.html_url }}
+          color: 0x10B981
+          username: "Illusion Bot"
+          avatar_url: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"

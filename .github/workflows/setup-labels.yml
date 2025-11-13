@@ -1,0 +1,73 @@
+name: Setup Repository Labels
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/setup-labels.yml'
+
+jobs:
+  labels:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      
+    steps:
+    - name: Create/Update Labels
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const labels = [
+            { name: 'bug', color: 'd73a4a', description: '🐛 Etwas funktioniert nicht' },
+            { name: 'enhancement', color: 'a2eeef', description: '✨ Neues Feature oder Verbesserung' },
+            { name: 'documentation', color: '0075ca', description: '📚 Dokumentation verbessern' },
+            { name: 'good first issue', color: '7057ff', description: '👶 Gut für Einsteiger' },
+            { name: 'help wanted', color: '008672', description: '🆘 Hilfe benötigt' },
+            { name: 'question', color: 'd876e3', description: '❓ Weitere Informationen benötigt' },
+            { name: 'wontfix', color: 'ffffff', description: '🚫 Wird nicht behoben' },
+            { name: 'duplicate', color: 'cfd3d7', description: '📋 Duplikat eines anderen Issues' },
+            { name: 'invalid', color: 'e4e669', description: '⚠️ Ungültiges Issue' },
+            { name: 'ruby', color: 'cc342d', description: '💎 Ruby Code' },
+            { name: 'javascript', color: 'f1e05a', description: '🟨 JavaScript Code' },
+            { name: 'pbs', color: '89e051', description: '📊 PBS Dateien' },
+            { name: 'graphics', color: 'ff69b4', description: '🎨 Grafiken/Sprites' },
+            { name: 'audio', color: '9b59b6', description: '🎵 Audio/Musik' },
+            { name: 'translation', color: '3498db', description: '🌍 Übersetzungen' },
+            { name: 'performance', color: 'ff6b6b', description: '⚡ Performance-Problem' },
+            { name: 'security', color: 'ee0701', description: '🔒 Sicherheitsproblem' },
+            { name: 'dependencies', color: '0366d6', description: '📦 Dependencies Update' },
+            { name: 'ci/cd', color: '2ecc71', description: '🔧 CI/CD Workflows' },
+            { name: 'plugin', color: 'f39c12', description: '🔌 Plugin-bezogen' },
+            { name: 'battle system', color: 'e67e22', description: '⚔️ Battle Mechanik' },
+            { name: 'ui/ux', color: 'e91e63', description: '🎯 User Interface' },
+            { name: 'priority: low', color: '00ff00', description: '🟢 Niedrige Priorität' },
+            { name: 'priority: medium', color: 'ffff00', description: '🟡 Mittlere Priorität' },
+            { name: 'priority: high', color: 'ff0000', description: '🔴 Hohe Priorität' },
+          ];
+          
+          for (const label of labels) {
+            try {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: label.name,
+                color: label.color,
+                description: label.description
+              });
+              console.log(`✅ Created label: ${label.name}`);
+            } catch (error) {
+              if (error.status === 422) {
+                await github.rest.issues.updateLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name,
+                  color: label.color,
+                  description: label.description
+                });
+                console.log(`📝 Updated label: ${label.name}`);
+              } else {
+                console.log(`❌ Error with label ${label.name}: ${error.message}`);
+              }
+            }
+          }

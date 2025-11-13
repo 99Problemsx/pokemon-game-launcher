@@ -1,0 +1,53 @@
+name: Weekly Backup
+
+on:
+  schedule:
+    - cron: '0 2 * * 0'  # Sonntag 2 Uhr
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Create backup archive
+      run: |
+        DATE=$(date +%Y%m%d)
+        mkdir -p backups
+        
+        # PBS Files
+        if [ -d "PBS" ]; then
+          tar -czf backups/pbs-backup-$DATE.tar.gz PBS/
+          echo "✅ PBS backup created"
+        fi
+        
+        # Plugins
+        if [ -d "Plugins" ]; then
+          tar -czf backups/plugins-backup-$DATE.tar.gz Plugins/
+          echo "✅ Plugins backup created"
+        fi
+        
+        # Data
+        if [ -d "Data" ]; then
+          tar -czf backups/data-backup-$DATE.tar.gz Data/
+          echo "✅ Data backup created"
+        fi
+        
+    - name: Upload backup artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: weekly-backup-${{ github.run_number }}
+        path: backups/
+        retention-days: 90
+        
+    - name: Backup summary
+      run: |
+        echo "## 💾 Backup Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Backup created on: $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Files:" >> $GITHUB_STEP_SUMMARY
+        ls -lh backups/ >> $GITHUB_STEP_SUMMARY

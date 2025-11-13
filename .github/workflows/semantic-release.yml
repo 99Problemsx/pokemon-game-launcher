@@ -1,0 +1,49 @@
+name: Semantic Release
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v5
+      with:
+        node-version: '20'
+        
+    - name: Get version from commits
+      id: version
+      run: |
+        # Count commits since last tag
+        COUNT=$(git rev-list --count HEAD)
+        VERSION="v1.0.$COUNT"
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "📦 New version: $VERSION"
+        
+    - name: Generate changelog
+      run: |
+        echo "# Changelog" > CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        echo "## ${{ steps.version.outputs.version }} - $(date +%Y-%m-%d)" >> CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        git log --pretty=format:"- %s (%an)" --since="7 days ago" >> CHANGELOG.md || echo "- Initial release" >> CHANGELOG.md
+        
+    - name: Create summary
+      run: |
+        echo "## 📦 Release Info" >> $GITHUB_STEP_SUMMARY
+        echo "Version: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        cat CHANGELOG.md >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,306 @@
+name: Auto Release
+
+on:
+  push:
+    branches:
+      - release
+
+permissions:
+  contents: write
+  
+jobs:
+  create-release:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Get full history for version detection
+      
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          # Get the latest tag, or default to v0.0.0
+          $latestTag = git describe --tags --abbrev=0 2>$null
+          if (-not $latestTag) {
+            $latestTag = "v0.0.0"
+          }
+          
+          # Remove 'v' prefix for version manipulation
+          $version = $latestTag -replace '^v', ''
+          $versionParts = $version -split '\.'
+          $major = [int]$versionParts[0]
+          $minor = [int]$versionParts[1]
+          $patch = [int]$versionParts[2]
+          
+          # Check recent commits for conventional commit types
+          $commits = git log --pretty=format:"%s" HEAD~5..HEAD
+          $hasFeat = $commits | Select-String -Pattern "^feat:" -Quiet
+          $hasFix = $commits | Select-String -Pattern "^fix:" -Quiet
+          
+          # Bump version based on commit type
+          if ($hasFeat) {
+            # Feature commit: bump minor version (0.1.0 -> 0.2.0)
+            $minor++
+            $patch = 0
+          } elseif ($hasFix) {
+            # Fix commit: bump patch version (0.1.0 -> 0.1.1)
+            $patch++
+          } else {
+            # No conventional commit: bump patch by default
+            $patch++
+          }
+          
+          $newVersion = "$major.$minor.$patch"
+          $newTag = "v$newVersion"
+          
+          Write-Host "Previous version: $latestTag"
+          Write-Host "New version: $newTag"
+          
+          echo "version=$newVersion" >> $env:GITHUB_OUTPUT
+          echo "tag=$newTag" >> $env:GITHUB_OUTPUT
+        shell: pwsh
+      
+      - name: Create version file
+        run: |
+          $version = "${{ steps.get_tag.outputs.version }}"
+          Set-Content -Path "VERSION.txt" -Value $version
+          Write-Host "Created VERSION.txt with version $version"
+        shell: pwsh
+      
+      - name: Create game package
+        run: |
+          Write-Host "Creating game package..."
+          
+          # Create temporary directory for the release
+          $tempDir = "Pokemon-Illusion-Release"
+          New-Item -ItemType Directory -Force -Path $tempDir
+          
+          # Copy game files (exclude development files)
+          $includeDirs = @(
+            "Audio",
+            "Data", 
+            "Fonts",
+            "Graphics",
+            "PBS",
+            "Plugins"
+          )
+          
+          $includeFiles = @(
+            "Game.exe",
+            "Game.ini",
+            "mkxp.json",
+            "soundfont.sf2",
+            "VERSION.txt"
+          )
+          
+          # Copy directories
+          foreach ($dir in $includeDirs) {
+            if (Test-Path $dir) {
+              Write-Host "Copying $dir..."
+              Copy-Item -Path $dir -Destination "$tempDir\$dir" -Recurse -Force
+            }
+          }
+          
+          # Copy files
+          foreach ($file in $includeFiles) {
+            if (Test-Path $file) {
+              Write-Host "Copying $file..."
+              Copy-Item -Path $file -Destination "$tempDir\$file" -Force
+            }
+          }
+          
+          # Create ZIP
+          $zipName = "Pokemon-Illusion-${{ steps.get_tag.outputs.tag }}-Windows.zip"
+          Write-Host "Creating $zipName..."
+          Compress-Archive -Path "$tempDir\*" -DestinationPath $zipName -Force
+          
+          # Cleanup
+          Remove-Item -Path $tempDir -Recurse -Force
+          
+          Write-Host "Package created: $zipName"
+          echo "package_name=$zipName" >> $env:GITHUB_OUTPUT
+        id: package
+        shell: pwsh
+      
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          $tag = "${{ steps.get_tag.outputs.tag }}"
+          $previousTag = git describe --tags --abbrev=0 HEAD~1 2>$null
+          if (-not $previousTag) {
+            $previousTag = $(git rev-list --max-parents=0 HEAD)
+          }
+          
+          Write-Host "Generating changelog from $previousTag to $tag"
+          
+          # Get commits since last tag
+          $commits = git log --pretty=format:"%s|%h|%an" "$previousTag..HEAD"
+          
+          # Parse commits into categories
+          $features = @()
+          $fixes = @()
+          $other = @()
+          
+          foreach ($commit in $commits) {
+            if ($commit) {
+              $parts = $commit -split '\|'
+              $message = $parts[0]
+              $hash = $parts[1]
+              $author = $parts[2]
+              
+              if ($message -match "^feat(\(.+\))?:\s*(.+)") {
+                $features += "- $($matches[2]) (``$hash``)"
+              } elseif ($message -match "^fix(\(.+\))?:\s*(.+)") {
+                $fixes += "- $($matches[2]) (``$hash``)"
+              } else {
+                $other += "- $message (``$hash``)"
+              }
+            }
+          }
+          
+          # Build changelog
+          $changelog = "## Pokemon Illusion $tag`n`n"
+          
+          if ($features.Count -gt 0) {
+            $changelog += "### ✨ New Features`n"
+            $changelog += ($features -join "`n") + "`n`n"
+          }
+          
+          if ($fixes.Count -gt 0) {
+            $changelog += "### 🐛 Bug Fixes`n"
+            $changelog += ($fixes -join "`n") + "`n`n"
+          }
+          
+          if ($other.Count -gt 0) {
+            $changelog += "### 🔧 Other Changes`n"
+            $changelog += ($other -join "`n") + "`n`n"
+          }
+          
+          # Add installation instructions
+          $changelog += "### 📦 Installation`n"
+          $changelog += "1. Download ``Pokemon-Illusion-$tag-Windows.zip```n"
+          $changelog += "2. Extract the ZIP file`n"
+          $changelog += "3. Run ``Game.exe```n`n"
+          
+          $changelog += "---`n`n"
+          $changelog += "**Full Changelog**: https://github.com/${{ github.repository }}/compare/$previousTag...$tag"
+          
+          # Save changelog
+          $changelog | Out-File -FilePath "CHANGELOG.md" -Encoding UTF8
+          
+          # Also create JSON format for launcher
+          $changelogJson = @{
+            version = $tag
+            date = (Get-Date -Format "yyyy-MM-dd")
+            features = $features
+            fixes = $fixes
+            other = $other
+          } | ConvertTo-Json -Compress
+          
+          $changelogJson | Out-File -FilePath "changelog.json" -Encoding UTF8
+          
+          # Output for next steps
+          echo "changelog<<EOF" >> $env:GITHUB_OUTPUT
+          echo "$changelog" >> $env:GITHUB_OUTPUT
+          echo "EOF" >> $env:GITHUB_OUTPUT
+          
+          Write-Host "Changelog generated successfully!"
+        shell: pwsh
+      
+      - name: Create Release and Upload Assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = "${{ steps.get_tag.outputs.tag }}"
+          $packageName = "${{ steps.package.outputs.package_name }}"
+          
+          # Create release with GitHub CLI
+          Write-Host "Creating release $tag..."
+          gh release create $tag `
+            --title "Pokemon Illusion $tag" `
+            --notes-file "CHANGELOG.md" `
+            $packageName `
+            "changelog.json"
+          
+          Write-Host "Release created successfully!"
+        shell: pwsh
+      
+      - name: Discord Notification
+        if: success()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          if (-not $env:DISCORD_WEBHOOK) {
+            Write-Host "⚠️  DISCORD_WEBHOOK not configured - skipping notification"
+            exit 0
+          }
+          
+          $tag = "${{ steps.get_tag.outputs.tag }}"
+          $version = $tag -replace '^v', ''
+          
+          # Create Discord embed
+          $embed = @{
+            title = "🎮 New Pokemon Illusion Release!"
+            description = "Version **$tag** is now available!"
+            color = 5814783  # Pokemon yellow color
+            fields = @(
+              @{
+                name = "📦 Download"
+                value = "[Pokemon-Illusion-$tag-Windows.zip](https://github.com/${{ github.repository }}/releases/download/$tag/Pokemon-Illusion-$tag-Windows.zip)"
+                inline = $false
+              }
+              @{
+                name = "📝 Changelog"
+                value = "[View Full Changelog](https://github.com/${{ github.repository }}/releases/tag/$tag)"
+                inline = $false
+              }
+              @{
+                name = "🚀 Installation"
+                value = "1. Download the ZIP`n2. Extract files`n3. Run Game.exe"
+                inline = $false
+              }
+            )
+            thumbnail = @{
+              url = "https://raw.githubusercontent.com/${{ github.repository }}/main/assets/social-preview.png"
+            }
+            footer = @{
+              text = "Pokemon Illusion • Auto-Release"
+            }
+            timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+          }
+          
+          $payload = @{
+            username = "Pokemon Illusion"
+            avatar_url = "https://raw.githubusercontent.com/${{ github.repository }}/main/assets/social-preview.png"
+            content = "@everyone New release available! 🎉"
+            embeds = @($embed)
+          } | ConvertTo-Json -Depth 10
+          
+          # Send to Discord
+          try {
+            $response = Invoke-RestMethod -Uri $env:DISCORD_WEBHOOK -Method Post -Body $payload -ContentType "application/json"
+            Write-Host "✅ Discord notification sent successfully!"
+          } catch {
+            Write-Host "❌ Failed to send Discord notification: $_"
+            exit 0  # Don't fail the workflow
+          }
+        shell: pwsh
+      
+      - name: Release Summary
+        run: |
+          $tag = "${{ steps.get_tag.outputs.tag }}"
+          $packageName = "${{ steps.package.outputs.package_name }}"
+          
+          Write-Host "========================================" -ForegroundColor Green
+          Write-Host "  Release Created Successfully!" -ForegroundColor Green  
+          Write-Host "========================================" -ForegroundColor Green
+          Write-Host ""
+          Write-Host "Version: $tag" -ForegroundColor Cyan
+          Write-Host "Package: $packageName" -ForegroundColor Cyan
+          Write-Host "Release URL: https://github.com/${{ github.repository }}/releases/tag/$tag" -ForegroundColor Cyan
+          Write-Host ""
+          Write-Host "The Electron launcher can now download this release!" -ForegroundColor Yellow
+        shell: pwsh

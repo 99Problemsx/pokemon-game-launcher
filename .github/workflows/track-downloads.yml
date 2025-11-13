@@ -1,0 +1,40 @@
+name: Track Downloads
+
+on:
+  release:
+    types: [published]
+  schedule:
+    - cron: '0 0 * * *'  # Täglich
+  workflow_dispatch:
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Get repository stats
+      run: |
+        echo "## 📈 Repository Statistics" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Get stats via GitHub API
+        REPO="${{ github.repository }}"
+        
+        echo "### Stars: " >> $GITHUB_STEP_SUMMARY
+        curl -s "https://api.github.com/repos/$REPO" | grep "stargazers_count" | awk '{print $2}' | tr -d ',' >> $GITHUB_STEP_SUMMARY
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Forks: " >> $GITHUB_STEP_SUMMARY
+        curl -s "https://api.github.com/repos/$REPO" | grep "forks_count" | awk '{print $2}' | tr -d ',' >> $GITHUB_STEP_SUMMARY
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Watchers: " >> $GITHUB_STEP_SUMMARY
+        curl -s "https://api.github.com/repos/$REPO" | grep "watchers_count" | awk '{print $2}' | tr -d ',' >> $GITHUB_STEP_SUMMARY
+        
+    - name: Generate traffic report
+      run: |
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Last updated: $(date)" >> $GITHUB_STEP_SUMMARY

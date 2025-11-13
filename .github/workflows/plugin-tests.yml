@@ -1,0 +1,53 @@
+name: Plugin Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'Plugins/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'Plugins/**'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.0'
+        
+    - name: Check Plugin structure
+      run: |
+        echo "🔍 Checking Plugin structure..."
+        
+        if [ -d "Plugins" ]; then
+          PLUGIN_COUNT=$(find Plugins -name "*.rb" | wc -l)
+          echo "Found $PLUGIN_COUNT Ruby plugin files"
+          
+          echo "## 🔌 Plugin Overview" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Total plugins: $PLUGIN_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          find Plugins -type d -maxdepth 1 | tail -n +2 | while read dir; do
+            echo "- $(basename $dir)" >> $GITHUB_STEP_SUMMARY
+          done
+        else
+          echo "⚠️ No Plugins directory found"
+        fi
+        
+    - name: Validate Plugin syntax
+      run: |
+        echo "✅ Checking Plugin Ruby syntax..."
+        find Plugins -name "*.rb" | while read file; do
+          ruby -c "$file" || exit 1
+        done
+        echo "All plugins have valid syntax!"

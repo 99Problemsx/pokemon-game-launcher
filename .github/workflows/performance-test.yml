@@ -1,0 +1,40 @@
+name: Performance Test
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**/*.rb'
+      - '**/*.js'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  performance:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Analyze file sizes
+      run: |
+        echo "## 📊 Performance Metrics" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        echo "### Largest Ruby files:" >> $GITHUB_STEP_SUMMARY
+        find . -name "*.rb" -type f -exec du -h {} + | sort -rh | head -10 >> $GITHUB_STEP_SUMMARY || echo "None" >> $GITHUB_STEP_SUMMARY
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Largest JavaScript files:" >> $GITHUB_STEP_SUMMARY
+        find . -name "*.js" -type f -exec du -h {} + | sort -rh | head -5 >> $GITHUB_STEP_SUMMARY || echo "None" >> $GITHUB_STEP_SUMMARY
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Repository size:" >> $GITHUB_STEP_SUMMARY
+        du -sh . >> $GITHUB_STEP_SUMMARY
+        
+    - name: Check for large files
+      run: |
+        echo "🔍 Checking for files larger than 10MB..."
+        find . -type f -size +10M | grep -v ".git" || echo "✅ No large files found"

@@ -1,0 +1,28 @@
+{
+  "gifts": {
+    "EXAMPLE2025": {
+      "type": "items",
+      "items": [
+        { "item": "POKEBALL", "quantity": 10 },
+        { "item": "MONEY", "quantity": 5000 }
+      ]
+    },
+    "DEMO100": {
+      "type": "pokemon",
+      "pokemon": {
+        "species": "PIKACHU",
+        "level": 5,
+        "shiny": true,
+        "item": null,
+        "moves": ["THUNDERSHOCK", "GROWL"]
+      }
+    },
+    "BETA": {
+      "type": "items",
+      "items": [
+        { "item": "BETA_BADGE", "quantity": 1 },
+        { "item": "MONEY", "quantity": 1000 }
+      ]
+    }
+  }
+}

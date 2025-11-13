@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#a855f7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9333ea;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="128" cy="128" r="120" fill="url(#grad1)" filter="url(#glow)"/>
+  
+  <!-- Inner Circle -->
+  <circle cx="128" cy="128" r="100" fill="none" stroke="white" stroke-width="4" opacity="0.3"/>
+  
+  <!-- Letter I -->
+  <text x="128" y="180" font-size="140" font-weight="bold" text-anchor="middle" fill="white" font-family="Arial, sans-serif">I</text>
+  
+  <!-- Shine effect -->
+  <ellipse cx="100" cy="80" rx="40" ry="60" fill="white" opacity="0.2" transform="rotate(-30 100 80)"/>
+</svg>

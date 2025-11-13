@@ -1,0 +1,59 @@
+name: Build & Release Launcher
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: launcher-electron/package-lock.json
+
+      - name: Install Dependencies
+        working-directory: launcher-electron
+        run: npm ci
+
+      - name: Build Vite
+        working-directory: launcher-electron
+        run: npm run build
+
+      - name: Build Electron (Windows)
+        working-directory: launcher-electron
+        run: npm run build:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installers
+          path: |
+            launcher-electron/dist-electron/*.exe
+            launcher-electron/dist-electron/latest.yml
+          retention-days: 7
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            launcher-electron/dist-electron/Mirrorbytes Studio-*-Setup.exe
+            launcher-electron/dist-electron/Mirrorbytes Studio-*-Portable.exe
+            launcher-electron/dist-electron/latest.yml
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,46 @@
+{
+  "games": [
+    {
+      "id": "your-game-id",
+      "name": "Your Game Name",
+      "descriptionKey": "yourGameDesc",
+      "version": "v1.0.0",
+      "coverImage": "/assets/games/your-game-cover.jpg",
+      "repo": {
+        "owner": "YourGitHubUsername",
+        "name": "your-game-repo"
+      },
+      "installPath": "Your Game Name",
+      "exeName": "Game.exe",
+      "saveFolder": "Your Game Name",
+      "discord": {
+        "clientId": "YOUR_DISCORD_APP_ID",
+        "appName": "Your Game Name"
+      }
+    },
+    {
+      "id": "second-game",
+      "name": "Second Game (Optional)",
+      "descriptionKey": "secondGameDesc",
+      "version": "v1.0.0",
+      "coverImage": "/assets/games/second-game-cover.jpg",
+      "repo": {
+        "owner": "YourGitHubUsername",
+        "name": "second-game-repo"
+      },
+      "installPath": "Second Game",
+      "exeName": "Game.exe",
+      "saveFolder": "Second Game",
+      "discord": {
+        "clientId": "SECOND_DISCORD_APP_ID",
+        "appName": "Second Game"
+      }
+    }
+  ],
+  "launcher": {
+    "studioName": "Your Studio Name",
+    "discord": {
+      "clientId": "LAUNCHER_DISCORD_APP_ID"
+    }
+  }
+}

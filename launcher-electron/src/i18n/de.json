@@ -1,0 +1,142 @@
+{
+  "app": {
+    "name": "Mirrorbytes Studio",
+    "welcome": "Willkommen bei Mirrorbytes Studio!"
+  },
+  "nav": {
+    "home": "Home",
+    "library": "Bibliothek",
+    "updates": "News & Updates",
+    "dailylogin": "Daily Rewards",
+    "achievements": "Belohnungen",
+    "backup": "Backups",
+    "statistics": "Statistiken",
+    "discord": "Discord",
+    "themes": "Themes",
+    "launchoptions": "Launch Optionen",
+    "settings": "Einstellungen"
+  },
+  "game": {
+    "play": "Spielen",
+    "install": "Installieren",
+    "update": "Update verfügbar",
+    "updating": "Update läuft...",
+    "downloading": "Herunterladen...",
+    "launching": "Startet...",
+    "installed": "Installiert",
+    "notInstalled": "Nicht installiert",
+    "version": "Version",
+    "playtime": "Spielzeit",
+    "openFolder": "Ordner öffnen",
+    "uninstall": "Deinstallieren",
+    "checkUpdates": "Nach Updates suchen"
+  },
+  "home": {
+    "title": "Deine Spiele",
+    "readyToPlay": "Bereit zum Spielen"
+  },
+  "library": {
+    "title": "Bibliothek"
+  },
+  "achievements": {
+    "title": "Erfolge & Belohnungen",
+    "progress": "Fortschritt",
+    "unlocked": "Freigeschaltet",
+    "locked": "Gesperrt",
+    "points": "Punkte",
+    "mysteryGift": "Mystery Gift",
+    "enterCode": "Code eingeben",
+    "redeem": "Einlösen",
+    "redeemed": "Bereits eingelöst",
+    "invalidCode": "Ungültiger Code",
+    "success": "Erfolgreich eingelöst!"
+  },
+  "discord": {
+    "title": "Discord Integration",
+    "description": "Zeige deine Aktivität in Discord",
+    "status": "Status",
+    "connected": "Mit Discord verbunden",
+    "notConnected": "Nicht verbunden",
+    "richPresence": "Rich Presence",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert",
+    "showDetails": "Details anzeigen",
+    "showDetailsDesc": "Zeige Spielinformationen (Ort, Zeit, etc.)",
+    "preview": "Vorschau",
+    "testActivities": "Test Activities",
+    "launcher": "Launcher",
+    "battle": "Kampf",
+    "training": "Training",
+    "trading": "Tausch",
+    "exploring": "Erkunden",
+    "menu": "Menü",
+    "gym": "Arena",
+    "catching": "Fangen",
+    "inGame": "Im Spiel (mit Map)",
+    "note": "Hinweis",
+    "noteText": "Discord muss geöffnet sein, damit Rich Presence funktioniert. Die Activity wird automatisch aktualisiert während du spielst.",
+    "mapTip": "Die Map wird automatisch erkannt und angezeigt wenn du im Spiel bist!"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "language": "Sprache",
+    "gameInstallPath": "Spiel-Installationspfad",
+    "autoUpdate": "Automatische Updates",
+    "autoUpdateDesc": "Updates automatisch herunterladen",
+    "notifications": "Benachrichtigungen",
+    "notificationsDesc": "Desktop-Benachrichtigungen anzeigen",
+    "theme": "Theme",
+    "save": "Speichern",
+    "cancel": "Abbrechen"
+  },
+  "backup": {
+    "title": "Spielstand-Backups",
+    "description": "Sichere und stelle deine Spielstände wieder her",
+    "createBackup": "Backup erstellen",
+    "restoreBackup": "Backup wiederherstellen",
+    "deleteBackup": "Backup löschen",
+    "noBackups": "Keine Backups vorhanden",
+    "backupCreated": "Backup erfolgreich erstellt",
+    "backupRestored": "Backup erfolgreich wiederhergestellt",
+    "backupDeleted": "Backup gelöscht"
+  },
+  "updates": {
+    "title": "Updates & Neuigkeiten",
+    "checkingUpdates": "Suche nach Updates...",
+    "noUpdates": "Du bist auf dem neuesten Stand!",
+    "updateAvailable": "Update verfügbar!",
+    "currentVersion": "Aktuelle Version",
+    "latestVersion": "Neueste Version",
+    "downloadUpdate": "Update herunterladen",
+    "releaseNotes": "Release Notes"
+  },
+  "notifications": {
+    "downloadStarted": "Download gestartet",
+    "downloadComplete": "Download abgeschlossen",
+    "installationComplete": "Installation abgeschlossen",
+    "updateInstalled": "Update installiert",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "gameLaunched": "Spiel gestartet",
+    "folderOpened": "Ordner geöffnet"
+  },
+  "errors": {
+    "gameNotInstalled": "Spiel ist nicht installiert",
+    "downloadFailed": "Download fehlgeschlagen",
+    "installationFailed": "Installation fehlgeschlagen",
+    "launchFailed": "Spiel konnte nicht gestartet werden",
+    "updateCheckFailed": "Update-Prüfung fehlgeschlagen",
+    "pathNotAvailable": "Pfad nicht verfügbar",
+    "backupFailed": "Backup fehlgeschlagen",
+    "restoreFailed": "Wiederherstellung fehlgeschlagen"
+  },
+  "dialogs": {
+    "confirm": "Bestätigen",
+    "confirmUninstall": "Möchtest du dieses Spiel wirklich deinstallieren?",
+    "confirmDelete": "Möchtest du dieses Backup wirklich löschen?",
+    "yes": "Ja",
+    "no": "Nein",
+    "ok": "OK",
+    "cancel": "Abbrechen"
+  }
+}

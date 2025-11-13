@@ -1,0 +1,130 @@
+{
+  "name": "mirrorbytes-studio",
+  "version": "1.0.0",
+  "description": "Mirrorbytes Studio - Modern Multi-Game Launcher for Pokémon Fangames",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "concurrently -k \"npm run dev:vite\" \"npm run dev:electron\"",
+    "dev:vite": "vite",
+    "dev:electron": "wait-on http://localhost:5173 && cross-env ELECTRON_ENABLE_LOGGING=1 electron .",
+    "build": "vite build",
+    "build:win": "npm run build && electron-builder --win",
+    "build:mac": "npm run build && electron-builder --mac",
+    "build:linux": "npm run build && electron-builder --linux"
+  },
+  "keywords": [
+    "pokemon",
+    "launcher",
+    "electron",
+    "react"
+  ],
+  "author": "Mirrorbytes Studio",
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.16",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^5.1.0",
+    "autoprefixer": "^10.4.16",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^39.0.0",
+    "electron-builder": "^26.0.12",
+    "framer-motion": "^12.23.24",
+    "postcss": "^8.4.32",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-icons": "^5.5.0",
+    "tailwindcss": "^4.1.16",
+    "vite": "^7.1.9",
+    "wait-on": "^9.0.1"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "discord-rpc": "^4.0.1",
+    "dotenv": "^17.2.3",
+    "react-markdown": "^10.1.0",
+    "react-toastify": "^11.0.5",
+    "recharts": "^3.2.1"
+  },
+  "build": {
+    "appId": "com.mirrorbytes.studio",
+    "productName": "Mirrorbytes Studio",
+    "directories": {
+      "output": "dist-electron",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "src/services/**/*",
+      "!**/*.map"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "${productName}-${version}-Setup.${ext}",
+      "publisherName": "Mirrorbytes Studio",
+      "verifyUpdateCodeSignature": false,
+      "sign": null,
+      "signingHashAlgorithms": [],
+      "signAndEditExecutable": false,
+      "signDlls": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Mirrorbytes Studio",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "deleteAppDataOnUninstall": false,
+      "include": "build/installer.nsh"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-Portable.${ext}"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "build/icon.icns",
+      "category": "public.app-category.games",
+      "darkModeSupport": true
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "build/icon.png",
+      "category": "Game"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "99Problemsx",
+      "repo": "mirrorbytes-launcher",
+      "releaseType": "release"
+    },
+    "asarUnpack": [
+      "node_modules/discord-rpc/**/*",
+      "node_modules/adm-zip/**/*"
+    ]
+  }
+}

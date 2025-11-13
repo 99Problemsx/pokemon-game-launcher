@@ -1,0 +1,67 @@
+name-template: 'v$RESOLVED_VERSION 🎮'
+tag-template: 'v$RESOLVED_VERSION'
+categories:
+  - title: '🎉 Features'
+    labels:
+      - 'enhancement'
+      - 'feature'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'bug'
+      - 'fix'
+  - title: '🔒 Security'
+    labels:
+      - 'security'
+  - title: '⚡ Performance'
+    labels:
+      - 'performance'
+  - title: '📚 Documentation'
+    labels:
+      - 'documentation'
+  - title: '🔌 Plugins'
+    labels:
+      - 'plugin'
+  - title: '🎨 Graphics'
+    labels:
+      - 'graphics'
+  - title: '🌍 Translations'
+    labels:
+      - 'translation'
+  - title: '🔧 Maintenance'
+    labels:
+      - 'ci/cd'
+      - 'dependencies'
+      - 'chore'
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-title-escapes: '\<*_&'
+version-resolver:
+  major:
+    labels:
+      - 'breaking'
+      - 'major'
+  minor:
+    labels:
+      - 'enhancement'
+      - 'feature'
+  patch:
+    labels:
+      - 'bug'
+      - 'fix'
+      - 'documentation'
+  default: patch
+template: |
+  ## 🎮 What's Changed in Illusion
+
+  $CHANGES
+
+  ## 📊 Statistics
+  
+  **Contributors**: $CONTRIBUTORS
+  
+  ## 🙏 Thanks to all contributors!
+  
+  $CONTRIBUTORS
+
+  ---
+  
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION

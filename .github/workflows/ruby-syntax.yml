@@ -1,0 +1,34 @@
+name: Ruby Syntax Check
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - '**/*.rb'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - '**/*.rb'
+  workflow_dispatch:
+
+jobs:
+  syntax-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.0'
+        
+    - name: Check Ruby syntax
+      run: |
+        echo "Checking Ruby syntax..."
+        find . -name "*.rb" -type f | while read file; do
+          echo "Checking $file..."
+          ruby -c "$file" || exit 1
+        done
+        echo "✅ All Ruby files have valid syntax!"

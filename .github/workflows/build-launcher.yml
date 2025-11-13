@@ -1,0 +1,150 @@
+name: Build Launcher
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'launcher/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'launcher/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Launcher - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+        
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: launcher/package-lock.json
+          
+      - name: Install dependencies
+        working-directory: launcher
+        run: npm ci
+        
+      - name: Build Electron app (Windows)
+        if: matrix.os == 'windows-latest'
+        working-directory: launcher
+        run: npm run build:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Build Electron app (macOS)
+        if: matrix.os == 'macos-latest'
+        working-directory: launcher
+        run: npm run build:mac
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false  # Skip code signing for now
+          
+      - name: Upload Windows artifacts
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: launcher-windows
+          path: |
+            launcher/dist/*.exe
+            launcher/dist/*.zip
+          retention-days: 30
+          
+      - name: Upload macOS artifacts
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: launcher-macos
+          path: |
+            launcher/dist/*.dmg
+            launcher/dist/*.zip
+          retention-days: 30
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: launcher-windows
+          path: dist-windows
+          
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: launcher-macos
+          path: dist-macos
+          
+      - name: Get launcher version
+        id: version
+        working-directory: launcher
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: launcher-v${{ steps.version.outputs.version }}
+          name: Launcher v${{ steps.version.outputs.version }}
+          body: |
+            # Pokémon Illusion Launcher v${{ steps.version.outputs.version }}
+            
+            ## 📦 Downloads
+            
+            ### Windows
+            - **Installer**: `Illusion-Launcher-Setup-${{ steps.version.outputs.version }}.exe`
+            - **Portable**: `Illusion-Launcher-${{ steps.version.outputs.version }}-win.zip`
+            
+            ### macOS
+            - **DMG**: `Illusion-Launcher-${{ steps.version.outputs.version }}.dmg`
+            - **ZIP**: `Illusion-Launcher-${{ steps.version.outputs.version }}-mac.zip`
+            
+            ## ✨ Features
+            
+            - Auto-update game from GitHub Releases
+            - Self-updating launcher
+            - Modern UI with progress tracking
+            - Cross-platform support
+            
+            ## 🚀 Installation
+            
+            ### Windows
+            1. Download the installer `.exe` file
+            2. Run the installer
+            3. Launch from Start Menu or Desktop shortcut
+            
+            ### macOS
+            1. Download the `.dmg` file
+            2. Open and drag to Applications folder
+            3. Right-click and select "Open" on first launch
+            
+            ---
+            
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/launcher-v${{ steps.version.outputs.version }}...launcher-v${{ steps.version.outputs.version }}
+          draft: false
+          prerelease: false
+          files: |
+            dist-windows/*
+            dist-macos/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

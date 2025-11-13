@@ -1,0 +1,107 @@
+name: 📚 Update Wiki
+on:
+  push:
+    branches: [github]
+    paths:
+      - 'docs/**'
+      - 'README.md'
+      - 'CONTRIBUTING.md'
+      - '.github/CODE_OF_CONDUCT.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📥 Checkout Wiki
+        id: checkout-wiki
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}.wiki
+          path: wiki
+
+      - name: ⚠️ Wiki Not Activated
+        if: steps.checkout-wiki.outcome == 'failure'
+        run: |
+          echo "::warning::Wiki is not activated yet. Please enable it in Settings > Features > Wikis"
+          echo "See docs/WIKI-ACTIVATION.md for instructions"
+          exit 0
+
+      - name: 📝 Sync Documentation to Wiki
+        if: steps.checkout-wiki.outcome == 'success'
+        run: |
+          # Copy main documentation files
+          cp README.md wiki/Home.md
+          cp .github/CODE_OF_CONDUCT.md wiki/Code-of-Conduct.md
+          cp .github/CONTRIBUTING.md wiki/Contributing.md
+          cp .github/SECURITY.md wiki/Security-Policy.md
+          
+          # Copy wiki pages
+          if [ -d "docs/wiki" ]; then
+            cp -r docs/wiki/* wiki/
+          fi
+          
+          # Copy branding guide
+          if [ -f "docs/BRANDING.md" ]; then
+            cp docs/BRANDING.md wiki/Branding.md
+          fi
+
+      - name: 📊 Generate Wiki Sidebar
+        if: steps.checkout-wiki.outcome == 'success'
+        run: |
+          cat > wiki/_Sidebar.md << 'EOF'
+          ## 📚 Navigation
+          
+          ### 🏠 Main
+          - [Home](Home)
+          - [About](../about.html)
+          - [FAQ](../faq.html)
+          
+          ### 🎮 For Players
+          - [Installation](Installation)
+          - [Gameplay Guide](Gameplay)
+          - [Pokédex](../pokemon-list.html)
+          
+          ### 🛠️ For Developers
+          - [Contributing](Contributing)
+          - [Project Structure](Project-Structure)
+          - [PBS Reference](PBS-Reference)
+          - [Code of Conduct](Code-of-Conduct)
+          
+          ### 📖 Resources
+          - [Security Policy](Security-Policy)
+          - [Branding](Branding)
+          
+          ---
+          
+          **[⬅ Back to Repository](../)**
+          EOF
+
+      - name: 📊 Generate Wiki Footer
+        if: steps.checkout-wiki.outcome == 'success'
+        run: |
+          cat > wiki/_Footer.md << 'EOF'
+          ---
+          
+          **Illusion** | Pokémon Essentials v21 Fan Game
+          
+          © 2025 | Not affiliated with Nintendo/Game Freak
+          EOF
+
+      - name: 🚀 Push to Wiki
+        if: steps.checkout-wiki.outcome == 'success'
+        working-directory: wiki
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git diff --quiet && git diff --staged --quiet || (git commit -m "📚 Auto-update wiki from docs [skip ci]" && git push)

@@ -1,0 +1,63 @@
+name: Milestone Automation
+
+on:
+  issues:
+    types: [closed, reopened]
+  pull_request:
+    types: [closed, merged]
+
+jobs:
+  manage-milestones:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      
+    steps:
+    - name: Move to next milestone
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { data: milestones } = await github.rest.issues.listMilestones({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            sort: 'due_on',
+            direction: 'asc'
+          });
+          
+          if (milestones.length === 0) {
+            console.log('No open milestones found');
+            return;
+          }
+          
+          const nextMilestone = milestones[0];
+          
+          if (context.eventName === 'issues') {
+            const issue = context.payload.issue;
+            
+            if (issue.state === 'closed' && !issue.milestone) {
+              // Add to next milestone when closed
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                milestone: nextMilestone.number
+              });
+              console.log(`Added issue #${issue.number} to milestone: ${nextMilestone.title}`);
+            }
+          }
+          
+          if (context.eventName === 'pull_request' && context.payload.pull_request.merged) {
+            const pr = context.payload.pull_request;
+            
+            if (!pr.milestone) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                milestone: nextMilestone.number
+              });
+              console.log(`Added PR #${pr.number} to milestone: ${nextMilestone.title}`);
+            }
+          }

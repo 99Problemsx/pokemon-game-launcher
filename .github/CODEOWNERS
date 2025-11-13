@@ -1,0 +1,36 @@
+# Code Owners für Illusion Pokémon Essentials
+
+# Diese Datei definiert wer für welche Bereiche des Projekts verantwortlich ist
+# Reviews werden automatisch von den entsprechenden Owners angefordert
+
+# Default: Maintainer Team
+# * @maintainer-team
+
+# GitHub Workflows und CI/CD
+# /.github/ @devops-team
+
+# PBS Dateien - Pokémon Battle System Daten
+# /PBS/ @data-team
+
+# Ruby Plugins
+# /Plugins/ @plugin-team
+
+# Web Assets (Pokédex Website)
+# *.html @web-team
+# *.css @web-team
+# *.js @web-team
+
+# Dokumentation
+# *.md @docs-team
+
+# Grafiken
+# /Graphics/ @graphics-team
+# /Animations/ @graphics-team
+
+# Audio
+# /Audio/ @audio-team
+
+# Übersetzungen
+# /Text_deutsch_core/ @translation-team
+# /Text_deutsch_game/ @translation-team
+# /Text_english_core/ @translation-team

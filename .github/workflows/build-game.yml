@@ -1,0 +1,111 @@
+name: Build Game Release
+
+on:
+  push:
+    branches:
+      - game  # Trigger on game branch pushes
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/**'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version for the build'
+        required: true
+        default: 'v1.0.0'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: game  # Always checkout game branch
+
+      
+    - name: Setup build info
+      id: build_info
+      run: |
+        if [ "${{ github.event_name }}" == "release" ]; then
+          echo "version=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+        else
+          echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+        fi
+      shell: bash
+      
+    - name: Create build directory
+      run: |
+        mkdir -p build/Illusion-${{ steps.build_info.outputs.version }}
+      shell: bash
+      
+    - name: Copy game files
+      run: |
+        # Core game files
+        cp -r PBS build/Illusion-${{ steps.build_info.outputs.version }}/ 2>/dev/null || true
+        cp -r Plugins build/Illusion-${{ steps.build_info.outputs.version }}/ 2>/dev/null || true
+        cp -r Graphics build/Illusion-${{ steps.build_info.outputs.version }}/ 2>/dev/null || true
+        cp -r Audio build/Illusion-${{ steps.build_info.outputs.version }}/ 2>/dev/null || true
+        cp -r Data build/Illusion-${{ steps.build_info.outputs.version }}/ 2>/dev/null || true
+        cp -r Fonts build/Illusion-${{ steps.build_info.outputs.version }}/ 2>/dev/null || true
+        
+        # Executables and configs
+        cp *.exe build/Illusion-${{ steps.build_info.outputs.version }}/ 2>/dev/null || true
+        cp *.dll build/Illusion-${{ steps.build_info.outputs.version }}/ 2>/dev/null || true
+        cp Game.ini build/Illusion-${{ steps.build_info.outputs.version }}/ 2>/dev/null || true
+        cp mkxp.json build/Illusion-${{ steps.build_info.outputs.version }}/ 2>/dev/null || true
+        cp LICENSE build/Illusion-${{ steps.build_info.outputs.version }}/ 2>/dev/null || true
+        cp README.md build/Illusion-${{ steps.build_info.outputs.version }}/ 2>/dev/null || true
+      shell: bash
+      
+    - name: Create README for release
+      run: |
+        cat > build/Illusion-${{ steps.build_info.outputs.version }}/README.txt << 'EOF'
+        ========================================
+        Illusion - Pokemon Essentials Game
+        Version: ${{ steps.build_info.outputs.version }}
+        ========================================
+
+        INSTALLATION:
+        1. Entpacke alle Dateien
+        2. Starte Game.exe oder Illusion.exe
+
+        SYSTEM REQUIREMENTS:
+        - Windows 7 oder neuer
+        - 2 GB RAM
+        - 500 MB freier Speicherplatz
+
+        SUPPORT:
+        - GitHub: https://github.com/99Problemsx/Illusion
+        - Issues: https://github.com/99Problemsx/Illusion/issues
+
+        Viel Spaß beim Spielen!
+        EOF
+      shell: bash
+      
+    - name: Create ZIP archive
+      run: |
+        cd build
+        7z a -tzip Illusion-${{ steps.build_info.outputs.version }}.zip Illusion-${{ steps.build_info.outputs.version }}/
+      shell: bash
+      
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Illusion-${{ steps.build_info.outputs.version }}
+        path: build/Illusion-${{ steps.build_info.outputs.version }}.zip
+        
+    - name: Upload to release
+      if: github.event_name == 'release'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: build/Illusion-${{ steps.build_info.outputs.version }}.zip
+        asset_name: Illusion-${{ steps.build_info.outputs.version }}.zip
+        asset_content_type: application/zip
