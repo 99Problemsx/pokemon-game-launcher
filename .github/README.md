@@ -486,27 +486,6 @@ This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file
 
 ---
 
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/YourUsername/your-launcher/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/YourUsername/your-launcher/discussions)
-- **Discord**: [Your Discord Server](https://discord.gg/yourserver)
-
----
-
-## 🗺️ Roadmap
-
-- [ ] macOS support
-- [ ] Linux support
-- [ ] Cloud save sync
-- [ ] In-launcher game updates (delta patching)
-- [ ] Mod manager integration
-- [ ] Streaming/broadcast integration
-- [ ] Controller support configuration
-- [ ] Voice chat integration
-
----
-
 ## 📊 Stats
 
 ![GitHub stars](https://img.shields.io/github/stars/YourUsername/your-launcher?style=social)
