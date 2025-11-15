@@ -14,7 +14,7 @@ const NewsSection = ({ selectedGame }) => {
   const fetchNews = async () => {
     try {
       // Fetch latest releases from GitHub
-      const response = await fetch(`https://api.github.com/repos/99Problemsx/${selectedGame.repo}/releases?per_page=10`);
+      const response = await fetch(`https://api.github.com/repos/${selectedGame.repo.owner}/${selectedGame.repo.name}/releases?per_page=10`);
       const releases = await response.json();
       
       // Filter out releases created by github-actions bot and take only 3

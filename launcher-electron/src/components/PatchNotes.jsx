@@ -24,7 +24,7 @@ const PatchNotes = ({ isOpen, onClose, releaseData }) => {
       }
 
       // Otherwise fetch from GitHub API
-      const response = await fetch(`https://api.github.com/repos/99Problemsx/Illusion/releases/${releaseData.id}`);
+      const response = await fetch(`https://api.github.com/repos/${releaseData.repo?.owner || "YourGitHubUsername"}/${releaseData.repo?.name || "your-repo"}/releases/${releaseData.id}`);
       const data = await response.json();
       setReleaseNotes(data);
     } catch (error) {

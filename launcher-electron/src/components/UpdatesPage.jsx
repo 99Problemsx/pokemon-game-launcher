@@ -48,7 +48,7 @@ const UpdatesPage = ({ selectedGame }) => {
 
   const loadReleases = async () => {
     try {
-      const response = await fetch(`https://api.github.com/repos/99Problemsx/${selectedGame.repo}/releases`);
+      const response = await fetch(`https://api.github.com/repos/${selectedGame.repo.owner}/${selectedGame.repo.name}/releases`);
       const data = await response.json();
       setReleases(data.slice(0, 10)); // Top 10 releases
     } catch (error) {

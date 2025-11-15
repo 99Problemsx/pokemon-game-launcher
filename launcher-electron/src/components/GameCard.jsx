@@ -202,7 +202,7 @@ const GameCard = ({ game }) => {
 
     try {
       console.log('🚀 Starting download from GitHub releases...');
-      console.log('📦 Repository: https://github.com/99Problemsx/' + game.repo + '/releases');
+      console.log('📦 Repository: https://github.com/' + game.repo.owner + '/' + game.repo.name + '/releases');
       
       // Get latest release download URL
       const result = await window.electron?.downloadGame(

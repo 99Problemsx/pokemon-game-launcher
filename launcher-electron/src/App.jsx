@@ -42,7 +42,7 @@ function App() {
     description: t(game.descriptionKey),
     version: game.version,
     image: game.coverImage,
-    repo: game.repo.name,
+    repo: game.repo, // Pass the whole repo object with owner and name
     status: 'not-installed', // Status wird dynamisch geprüft
     playTime: '0h 0m', // Wird nach Installation aktualisiert
   }));
