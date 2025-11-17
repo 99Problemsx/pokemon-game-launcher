@@ -56,7 +56,7 @@ jobs:
       
       - name: 📤 Upload Artifacts (Windows)
         if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Illusion-Launcher-Windows
           path: launcher-electron/dist/*.exe
@@ -64,7 +64,7 @@ jobs:
       
       - name: 📤 Upload Artifacts (macOS)
         if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Illusion-Launcher-macOS
           path: launcher-electron/dist/*.dmg
@@ -72,7 +72,7 @@ jobs:
       
       - name: 📤 Upload Artifacts (Linux)
         if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Illusion-Launcher-Linux
           path: launcher-electron/dist/*.AppImage
