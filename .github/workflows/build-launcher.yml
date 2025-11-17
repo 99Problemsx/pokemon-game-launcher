@@ -54,7 +54,7 @@ jobs:
           
       - name: Upload Windows artifacts
         if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: launcher-windows
           path: |
@@ -64,7 +64,7 @@ jobs:
           
       - name: Upload macOS artifacts
         if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: launcher-macos
           path: |

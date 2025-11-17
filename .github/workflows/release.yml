@@ -120,7 +120,7 @@ jobs:
       
       - name: Upload Artifact (if manual run)
         if: steps.release.outputs.is_manual == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: pokemon-illusion-${{ steps.release.outputs.tag }}
           path: ${{ env.ZIP_FILE }}
