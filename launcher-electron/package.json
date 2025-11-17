@@ -28,7 +28,7 @@
     "autoprefixer": "^10.4.16",
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
-    "electron": "^39.0.0",
+    "electron": "^39.2.1",
     "electron-builder": "^26.0.12",
     "framer-motion": "^12.23.24",
     "postcss": "^8.4.32",
